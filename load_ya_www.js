@@ -1,4 +1,5 @@
 import http from 'k6/http';
+import { group } from 'k6';
 
 export const options = {
   scenarios: {
@@ -37,16 +38,14 @@ export const options = {
   },
 };
 
-// Функция для первого сценария (ya.ru)
 export function ya_test() {
-  http.get('https://ya.ru', {
-    tags: { my_custom_tag: 'ya_ru' }, // Тег для фильтрации в Grafana
+  group('01_Yandex_Home', function () {
+    http.get('https://ya.ru', { tags: { name: '01_Yandex_Home' } });
   });
 }
 
-// Функция для второго сценария (www.ru)
 export function www_test() {
-  http.get('https://www.ru', {
-    tags: { my_custom_tag: 'www_ru' }, // Тег для фильтрации в Grafana
+  group('02_Www_Home', function () {
+    http.get('https://google.com', { tags: { name: '02_Www_Home' } });
   });
 }

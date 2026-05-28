@@ -1,24 +1,32 @@
-version: '3.8'
-
 services:
   influxdb:
-    image: influxdb:1.8
-    container_name: influxdb
+    image: influxdb:1.8-alpine
+    container_name: influxdb_vscode
     ports:
       - "8086:8086"
     environment:
-      - INFLUXDB_DB=k6
+      - INFLUXDB_DB=otus_webtours
+    volumes:
+      - influxdb_vscode_data:/var/lib/influxdb
 
   grafana:
     image: grafana/grafana:latest
-    container_name: grafana
+    container_name: grafana_vscode
     ports:
       - "3000:3000"
     environment:
-      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
-      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_SECURITY_ADMIN_PASSWORD=admin
     volumes:
-      - grafana-storage:/var/lib/grafana
+      - grafana_vscode_data:/var/lib/grafana
+      # Автоматическое подключение Data Source (InfluxDB)
+      - ./grafana/provisioning/datasources/datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml:ro
+      # Автоматическая конфигурация путей для дашбордов
+      - ./grafana/provisioning/dashboards/dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml:ro
+      # Файл самого дашборда
+      - ./dashboard.json:/etc/grafana/provisioning/dashboards/dashboard.json:ro
+    depends_on:
+      - influxdb
 
 volumes:
-  grafana-storage:
+  influxdb_vscode_data:
+  grafana_vscode_data:
